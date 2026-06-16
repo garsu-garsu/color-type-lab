@@ -1,0 +1,176 @@
+import { closeView, graniteEvent } from "@apps-in-toss/web-framework";
+import { Loader } from "@toss/tds-mobile";
+import { useEffect, useRef, useState } from "react";
+
+import "./App.css";
+import { HomeScreen } from "./screens/HomeScreen";
+import { QuizScreen } from "./screens/QuizScreen";
+import { ResultScreen } from "./screens/ResultScreen";
+import { TodayScreen } from "./screens/TodayScreen";
+import { useAdGate } from "./hooks/useAdGate";
+import { useColorState } from "./hooks/useColorState";
+import { useInterstitialAd } from "./hooks/useInterstitialAd";
+import { selectionToTypeId } from "./data/color";
+import { getTodayKey } from "./lib/dateKey";
+import { EVENT, track, trackScreen } from "./lib/analytics";
+
+type View = "home" | "quiz" | "result" | "today";
+
+function App() {
+  const { state, diagnose, touchDaily, addExtra, streakAtRisk, keepStreak } =
+    useColorState();
+  const { watchThen } = useAdGate();
+  const { maybeShow } = useInterstitialAd(3);
+
+  const [today, setToday] = useState<string>("");
+  const [view, setView] = useState<View>("home");
+  const [resultTypeId, setResultTypeId] = useState<number | null>(null);
+  const [resultStreak, setResultStreak] = useState(0);
+  // 현재 결과에서 광고로 해금한 섹션 키들 (결과마다 초기화)
+  const [unlocked, setUnlocked] = useState<Set<string>>(new Set());
+
+  // KST 오늘 날짜 키 로드
+  useEffect(() => {
+    let alive = true;
+    void getTodayKey().then((k) => {
+      if (alive) setToday(k);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  // 최초 1회 게스트 가입 이벤트
+  const signedRef = useRef(false);
+  useEffect(() => {
+    if (signedRef.current) return;
+    signedRef.current = true;
+    if (localStorage.getItem("color:signed") == null) {
+      localStorage.setItem("color:signed", "1");
+      track(EVENT.signup, { method: "guest" });
+    }
+  }, []);
+
+  useEffect(() => {
+    trackScreen(view);
+  }, [view]);
+
+  // 토스 네이티브 뒤로가기 → 홈이 아니면 홈으로, 홈이면 앱 닫기
+  const viewRef = useRef(view);
+  viewRef.current = view;
+  useEffect(() => {
+    try {
+      return graniteEvent.addEventListener("backEvent", {
+        onEvent: () => {
+          if (viewRef.current !== "home") {
+            setView("home");
+          } else {
+            try {
+              closeView();
+            } catch {
+              /* 브라우저 무시 */
+            }
+          }
+        },
+      });
+    } catch {
+      return undefined;
+    }
+  }, []);
+
+  const onStartQuiz = () => setView("quiz");
+
+  const onQuizDone = (sel: number[]) => {
+    const typeId = selectionToTypeId(sel);
+    const streak = diagnose(typeId, today); // 타입 저장 + 오늘 참여를 한 번에
+    track(EVENT.colorDiagnosed, { type_id: typeId });
+    setUnlocked(new Set());
+    setResultTypeId(typeId);
+    setResultStreak(streak);
+    maybeShow(() => setView("result"), "result");
+  };
+
+  const onUnlock = (section: string) => {
+    watchThen(() => {
+      setUnlocked((prev) => {
+        const next = new Set(prev);
+        next.add(section);
+        return next;
+      });
+      track(EVENT.sectionUnlocked, { section });
+    }, section);
+  };
+
+  const onGoToday = () => {
+    touchDaily(today); // 오늘의 추천 확인 = 오늘 참여
+    track(EVENT.dailyPickViewed, { type_id: state.typeId ?? -1 });
+    setView("today");
+  };
+
+  const onExtraPick = () =>
+    watchThen(() => {
+      addExtra(today);
+      track(EVENT.extraPickRevealed, {
+        type_id: state.typeId ?? -1,
+        index: state.daily.extraCount + 1,
+      });
+    }, "extra_pick");
+
+  const onKeepStreak = () => watchThen(() => keepStreak(today), "streak_save");
+
+  if (today === "") {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "60vh",
+        }}
+      >
+        <Loader />
+      </div>
+    );
+  }
+
+  if (view === "quiz") {
+    return <QuizScreen onDone={onQuizDone} onBack={() => setView("home")} />;
+  }
+
+  if (view === "result" && resultTypeId != null) {
+    return (
+      <ResultScreen
+        typeId={resultTypeId}
+        streakCount={resultStreak}
+        unlocked={unlocked}
+        onUnlock={onUnlock}
+        onGoToday={onGoToday}
+        onHome={() => setView("home")}
+      />
+    );
+  }
+
+  if (view === "today" && state.typeId != null) {
+    return (
+      <TodayScreen
+        typeId={state.typeId}
+        today={today}
+        extraCount={state.daily.dateKey === today ? state.daily.extraCount : 0}
+        onExtra={onExtraPick}
+        onHome={() => setView("home")}
+      />
+    );
+  }
+
+  return (
+    <HomeScreen
+      state={state}
+      atRisk={streakAtRisk(today)}
+      onStartQuiz={onStartQuiz}
+      onGoToday={onGoToday}
+      onKeepStreak={onKeepStreak}
+    />
+  );
+}
+
+export default App;
