@@ -8,6 +8,7 @@
     "build": "ait build",
     "deploy": "ait deploy",
     "lint": "eslint .",
+    "check:color": "node --experimental-strip-types scripts/color-check.ts",
     "format": "prettier --write ."
   },
   "dependencies": {

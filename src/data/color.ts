@@ -78,7 +78,7 @@ export interface ColorType {
   id: number; // 0~3
   key: "spring" | "autumn" | "summer" | "winter";
   emoji: string;
-  name: string; // "봄 웜톤"
+  name: string; // "봄웜톤" — 사람들이 실제로 검색하는 붙여쓴 표기
   oneLiner: string;
   summary: string; // 무료 공개
   bestColors: ColorChip[]; // 무료 공개 (베스트 컬러 4)
@@ -91,7 +91,7 @@ export const COLOR_TYPES: ColorType[] = [
     id: 0,
     key: "spring",
     emoji: "🌸",
-    name: "봄 웜톤",
+    name: "봄웜톤",
     oneLiner: "화사하고 생기 넘치는 따뜻한 컬러",
     summary:
       "맑고 밝은 색이 얼굴을 환하게 밝혀주는 타입이에요. 따뜻하면서도 가벼운 컬러가 생기를 더해 어려 보이고 화사한 인상을 줘요. 코랄과 피치처럼 화사한 색에서 가장 빛나요.",
@@ -113,7 +113,7 @@ export const COLOR_TYPES: ColorType[] = [
     id: 1,
     key: "autumn",
     emoji: "🍂",
-    name: "가을 웜톤",
+    name: "가을웜톤",
     oneLiner: "깊고 그윽한 어스 톤의 따뜻한 컬러",
     summary:
       "깊고 따뜻한 어스 톤이 분위기를 완성해주는 타입이에요. 차분하면서 고급스러운 색이 피부를 안정감 있게 받쳐줘 그윽하고 성숙한 매력을 살려줘요. 카멜과 올리브 같은 색이 잘 어울려요.",
@@ -135,7 +135,7 @@ export const COLOR_TYPES: ColorType[] = [
     id: 2,
     key: "summer",
     emoji: "💧",
-    name: "여름 쿨톤",
+    name: "여름쿨톤",
     oneLiner: "부드럽고 시원한 우아한 쿨 컬러",
     summary:
       "부드럽고 시원한 색이 우아함을 더해주는 타입이에요. 채도가 낮은 파스텔과 쿨 톤이 피부를 맑고 투명하게 보이게 해줘요. 라벤더와 로즈핑크처럼 은은한 색에서 가장 빛나요.",
@@ -157,7 +157,7 @@ export const COLOR_TYPES: ColorType[] = [
     id: 3,
     key: "winter",
     emoji: "❄️",
-    name: "겨울 쿨톤",
+    name: "겨울쿨톤",
     oneLiner: "선명하고 도시적인 카리스마 쿨 컬러",
     summary:
       "선명하고 대비가 강한 색을 멋지게 소화하는 타입이에요. 또렷한 컬러가 이목구비를 살려 도시적이고 시크한 인상을 완성해줘요. 퓨어 화이트와 로열 블루처럼 분명한 색에서 가장 빛나요.",
@@ -218,7 +218,7 @@ export const DAILY_PICKS: Record<ColorType["key"], DailyPick[]> = {
   ],
   autumn: [
     { hex: "#D9A038", colorName: "머스타드", tip: "머스타드 컬러 아이템으로 그윽하고 고급스러운 분위기를 더해보세요." },
-    { hex: "#B5733A", colorName: "카멜", tip: "카멜 코트나 니트는 가을 웜톤의 시그니처예요. 오늘 활용해보세요." },
+    { hex: "#B5733A", colorName: "카멜", tip: "카멜 코트나 니트는 가을웜톤의 시그니처예요. 오늘 활용해보세요." },
     { hex: "#6E7B3D", colorName: "올리브", tip: "올리브 그린으로 차분하면서 세련된 무드를 연출해보세요." },
     { hex: "#B5462F", colorName: "벽돌", tip: "벽돌빛 테라코타 립이나 의상으로 깊은 매력을 살려보세요." },
     { hex: "#8C5A2B", colorName: "초콜릿브라운", tip: "초콜릿 브라운 톤이 오늘 당신을 안정감 있게 받쳐줘요." },
@@ -228,14 +228,14 @@ export const DAILY_PICKS: Record<ColorType["key"], DailyPick[]> = {
     { hex: "#B7A6E0", colorName: "라벤더", tip: "라벤더 컬러로 부드럽고 우아한 분위기를 연출해보세요." },
     { hex: "#9DC3E6", colorName: "파우더블루", tip: "은은한 파우더 블루가 피부를 맑고 시원하게 보이게 해줘요." },
     { hex: "#E8A0BC", colorName: "로즈핑크", tip: "로즈 핑크 립으로 화사하면서 부드러운 무드를 완성해보세요." },
-    { hex: "#9BD4C4", colorName: "민트", tip: "소프트 민트 포인트가 여름 쿨톤의 청량함을 살려줘요." },
+    { hex: "#9BD4C4", colorName: "민트", tip: "소프트 민트 포인트가 여름쿨톤의 청량함을 살려줘요." },
     { hex: "#C9BBE0", colorName: "모브", tip: "모브 톤 섀도나 의상으로 은은하고 세련된 매력을 더해보세요." },
     { hex: "#A8B8D8", colorName: "블루그레이", tip: "차분한 블루 그레이가 오늘 우아한 분위기를 완성해줘요." },
   ],
   winter: [
     { hex: "#2E5BD4", colorName: "로열블루", tip: "선명한 로열 블루로 또렷하고 도시적인 인상을 연출해보세요." },
     { hex: "#D6266F", colorName: "푸시아", tip: "푸시아 핑크 립 하나로 카리스마 있는 무드를 완성해보세요." },
-    { hex: "#EDF1F7", colorName: "퓨어화이트", tip: "깨끗한 화이트가 겨울 쿨톤의 이목구비를 또렷하게 살려줘요." },
+    { hex: "#EDF1F7", colorName: "퓨어화이트", tip: "깨끗한 화이트가 겨울쿨톤의 이목구비를 또렷하게 살려줘요." },
     { hex: "#7A1F3D", colorName: "버건디", tip: "딥 버건디로 시크하고 강렬한 매력을 더해보세요." },
     { hex: "#1A1A1A", colorName: "블랙", tip: "선명한 블랙 앤 화이트 대비로 도시적인 시크함을 연출해보세요." },
     { hex: "#157A6E", colorName: "에메랄드", tip: "또렷한 에메랄드 그린이 쿨톤 피부를 더 돋보이게 해줘요." },

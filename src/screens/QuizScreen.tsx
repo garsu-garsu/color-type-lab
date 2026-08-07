@@ -31,7 +31,7 @@ export function QuizScreen({ onDone, onBack }: Props) {
         title={<Top.TitleParagraph size={22}>{question.title}</Top.TitleParagraph>}
         subtitleBottom={
           <Top.SubtitleParagraph size={15}>
-            {`${step + 1} / ${QUESTIONS.length} · 가장 가까운 걸 골라요`}
+            {`퍼스널컬러 진단 ${step + 1} / ${QUESTIONS.length} · 가장 가까운 걸 골라요`}
           </Top.SubtitleParagraph>
         }
       />

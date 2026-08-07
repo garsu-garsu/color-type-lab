@@ -45,28 +45,28 @@ const ctx = await browser.newContext({
   isMobile: true,
   hasTouch: true,
 });
-// 소개 화면은 첫 실행에만 떠요 — 투어는 본 화면부터 찍어야 하니 미리 본 것으로 표시해요.
-await ctx.addInitScript((k) => localStorage.setItem(k, "1"), "color:onboarded");
 const page = await ctx.newPage();
 
-// ── 홈 (진단 전) ──
+// ── 첫 실행 소개 화면 ──
 await page.goto(BASE, { waitUntil: "networkidle" });
-await waitText(page, "퍼스널컬러 연구소");
-await shot(page, "home-intro"); // 01
+await waitText(page, "6가지 질문에 답해요");
+await shot(page, "onboarding"); // 01
 
-// ── 진단 시작 → 6문항 (봄 웜톤: 웜 답 + 라이트 답) ──
-await tap(page, "내 퍼스널컬러 진단하기");
+// ── 소개 → 곧바로 첫 질문 (홈을 거치지 않아요) ──
+await tap(page, "바로 진단 시작하기");
 await waitText(page, "손목 안쪽 혈관");
 await shot(page, "quiz"); // 02
+
+// ── 6문항 (봄웜톤: 웜 답 + 라이트 답) ──
 await tap(page, "초록빛이 돈다"); // Q1 warm
 await tap(page, "골드"); // Q2 warm
 await tap(page, "갈색으로 잘 그을린다"); // Q3 warm
 await tap(page, "아이보리"); // Q4 warm
 await tap(page, "밝고 부드러운 파스텔"); // Q5 light
-await tap(page, "밝은 갈색 계열"); // Q6 light → 봄 웜톤
+await tap(page, "밝은 갈색 계열"); // Q6 light → 봄웜톤
 
 // ── 결과 ──
-await waitText(page, "내 퍼스널컬러가 나왔어요");
+await waitText(page, "내 퍼스널컬러 진단 결과");
 await shot(page, "result"); // 03
 
 // ── 광고로 상세 섹션 해금 (브라우저는 즉시 통과) ──

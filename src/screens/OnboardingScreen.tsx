@@ -16,7 +16,7 @@ const STEPS = [
   {
     emoji: "🌈",
     title: "내 타입과 베스트 컬러를 봐요",
-    body: "봄·여름·가을·겨울 4가지 톤 중 하나가 나와요. 광고를 보면 상세 코디와 피하면 좋은 색까지 열려요.",
+    body: "봄웜톤·여름쿨톤·가을웜톤·겨울쿨톤 중 하나가 나와요. 광고를 보면 상세 코디와 피하면 좋은 색까지 열려요.",
   },
   {
     emoji: "🔥",
@@ -29,13 +29,14 @@ const STEPS = [
 export function OnboardingScreen({ onStart }: Props) {
   return (
     <div style={{ paddingBottom: 32 }}>
+      {/* 앱 이름은 토스 상단 바가 이미 보여줘요 — 여기서 또 쓰면 헤더가 겹쳐 보여요. */}
       <Top
         title={
-          <Top.TitleParagraph size={26}>퍼스널컬러 연구소</Top.TitleParagraph>
+          <Top.TitleParagraph size={28}>나는 웜톤일까 쿨톤일까</Top.TitleParagraph>
         }
         subtitleBottom={
           <Top.SubtitleParagraph size={15}>
-            나에게 어울리는 색을 찾고, 매일 추천받아요
+            퍼스널컬러 진단부터 매일 어울리는 추천 색까지
           </Top.SubtitleParagraph>
         }
       />
@@ -76,7 +77,7 @@ export function OnboardingScreen({ onStart }: Props) {
 
         <div style={{ marginTop: 22 }}>
           <Button size="xlarge" display="full" onClick={onStart}>
-            시작하기
+            바로 진단 시작하기
           </Button>
         </div>
 

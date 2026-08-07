@@ -47,7 +47,7 @@ export function ResultScreen({
   const type = COLOR_TYPES[typeId];
 
   const onShare = async () => {
-    const ok = await shareResult(`${type.emoji} ${type.name}`);
+    const ok = await shareResult(typeId);
     if (ok) {
       track(EVENT.shareCompleted, { context: "result" });
       toast.openToast("공유했어요!");
@@ -62,7 +62,7 @@ export function ResultScreen({
       <Top
         title={
           <Top.TitleParagraph size={22}>
-            내 퍼스널컬러가 나왔어요
+            내 퍼스널컬러 진단 결과
           </Top.TitleParagraph>
         }
       />
@@ -205,11 +205,12 @@ export function ResultScreen({
             marginTop: 16,
           }}
         >
-          <Button size="large" display="full" onClick={onGoToday}>
-            오늘의 추천 색 보기
+          {/* 공유가 지금 이 앱의 유일한 유입 경로라, 결과 직후 가장 눈에 띄는 자리에 둬요. */}
+          <Button size="large" display="full" onClick={onShare}>
+            친구에게 내 컬러 공유하기
           </Button>
-          <Button variant="weak" display="full" onClick={onShare}>
-            결과 공유하기
+          <Button variant="weak" size="large" display="full" onClick={onGoToday}>
+            오늘의 추천 색 보기
           </Button>
           <div style={{ textAlign: "center" }}>
             <TextButton size="medium" onClick={onHome}>
@@ -228,7 +229,9 @@ export function ResultScreen({
             lineHeight: 1.6,
           }}
         >
-          재미로 보는 퍼스널컬러 진단 콘텐츠예요. 모든 보상은 앱 내 가상 보상이에요.
+          재미로 보는 퍼스널컬러 진단 콘텐츠예요. 의학적 진단이 아니에요.
+          <br />
+          모든 보상은 앱 내 가상 보상이에요.
         </div>
       </div>
 

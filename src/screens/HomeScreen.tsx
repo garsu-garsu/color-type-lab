@@ -2,12 +2,14 @@ import { Button, TextButton, Top, useToast } from "@toss/tds-mobile";
 
 import { BannerAd } from "../components/BannerAd";
 import { canRequestNotifyConsent, requestNotifyConsent } from "../data/notify";
+import { shareResult } from "../data/share";
 import { EVENT, track } from "../lib/analytics";
-import { COLOR_TYPES, rankOf } from "../data/color";
+import { COLOR_TYPES, dailyPickFor, rankOf } from "../data/color";
 import type { ColorState } from "../hooks/useColorState";
 
 interface Props {
   state: ColorState;
+  today: string; // KST 오늘 날짜 키 — 오늘의 추천 색 미리보기에 사용
   atRisk: boolean;
   onStartQuiz: () => void; // 진단 시작 / 다시 진단
   onGoToday: () => void; // 오늘의 추천 색 보기
@@ -28,6 +30,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 export function HomeScreen({
   state,
+  today,
   atRisk,
   onStartQuiz,
   onGoToday,
@@ -36,6 +39,17 @@ export function HomeScreen({
   const toast = useToast();
   const rank = rankOf(state.totalDays);
   const myType = state.typeId != null ? COLOR_TYPES[state.typeId] : null;
+  // 오늘의 추천 색 첫 장 — 오늘의 추천 화면과 같은 값이라 홈에서 미리 보여줘도 어긋나지 않아요.
+  const todayPick = myType != null ? dailyPickFor(myType.key, today) : null;
+
+  const onShare = async () => {
+    if (state.typeId == null) return;
+    const ok = await shareResult(state.typeId);
+    if (ok) {
+      track(EVENT.shareCompleted, { context: "home" });
+      toast.openToast("공유했어요!");
+    }
+  };
 
   const onNotify = async () => {
     const r = await requestNotifyConsent();
@@ -47,11 +61,13 @@ export function HomeScreen({
 
   return (
     <div style={{ paddingBottom: 32 }}>
+      {/* 앱 이름은 토스 상단 바가 이미 보여줘요. 여기서 또 쓰면 헤더가 겹쳐 보여
+          "자체 헤더 중복"으로 심사 반려돼요. 대신 무엇을 얻는지를 적어요. */}
       <Top
-        title={<Top.TitleParagraph size={28}>퍼스널컬러 연구소</Top.TitleParagraph>}
+        title={<Top.TitleParagraph size={28}>퍼스널컬러 진단</Top.TitleParagraph>}
         subtitleBottom={
           <Top.SubtitleParagraph size={15}>
-            나에게 어울리는 색을 찾고, 매일 추천받아요
+            퍼스널컬러 진단부터 매일 어울리는 추천 색까지
           </Top.SubtitleParagraph>
         }
       />
@@ -78,12 +94,14 @@ export function HomeScreen({
                   marginTop: 10,
                 }}
               >
-                내 퍼스널컬러는 무슨 타입일까?
+                나는 웜톤일까, 쿨톤일까?
               </div>
               <div
                 style={{ fontSize: 14, color: "#7A6A72", marginTop: 8, lineHeight: 1.6 }}
               >
-                6가지 질문으로 알아보는 나만의 컬러 타입
+                봄웜톤·여름쿨톤·가을웜톤·겨울쿨톤 중 내 타입은?
+                <br />
+                질문 6개면 나와요.
               </div>
             </div>
             <div style={{ marginTop: 20 }}>
@@ -137,6 +155,47 @@ export function HomeScreen({
               </div>
             )}
 
+            {/* 오늘의 추천 색 미리보기 — 매일 바뀌는 걸 홈 첫 화면에서 바로 보여줘야
+                다시 열 이유가 돼요. 이미 아는 내 타입 카드보다 위에 둬요. */}
+            {todayPick != null && (
+              <div
+                style={{
+                  marginTop: 16,
+                  background: "#FBEEF2",
+                  borderRadius: 16,
+                  padding: "16px 18px",
+                  display: "flex",
+                  gap: 16,
+                  alignItems: "center",
+                }}
+              >
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 16,
+                    background: todayPick.hex,
+                    border: "1px solid rgba(0,0,0,0.06)",
+                    flexShrink: 0,
+                  }}
+                />
+                <div>
+                  <div style={{ fontSize: 12, color: "#A899A1" }}>
+                    오늘 어울리는 색
+                  </div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: TEXT }}>
+                    {todayPick.colorName}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div style={{ marginTop: 12 }}>
+              <Button size="large" display="full" onClick={onGoToday}>
+                오늘의 코디 팁 보기
+              </Button>
+            </div>
+
             {/* 내 타입 카드 */}
             <div
               style={{
@@ -157,11 +216,6 @@ export function HomeScreen({
               </div>
             </div>
 
-            <div style={{ marginTop: 20 }}>
-              <Button size="large" display="full" onClick={onGoToday}>
-                오늘의 추천 색 보기
-              </Button>
-            </div>
             <div style={{ marginTop: 12 }}>
               <Button
                 variant="weak"
@@ -175,10 +229,19 @@ export function HomeScreen({
           </>
         )}
 
+        {/* 결과 화면을 다시 보지 않는 재방문자에게도 공유 동선을 열어둬요. */}
+        {myType != null && (
+          <div style={{ textAlign: "center", marginTop: 14 }}>
+            <TextButton size="medium" onClick={onShare}>
+              친구에게 내 컬러 공유하기
+            </TextButton>
+          </div>
+        )}
+
         {canRequestNotifyConsent() && (
           <div style={{ textAlign: "center", marginTop: 14 }}>
             <TextButton size="medium" onClick={onNotify}>
-              매일 알림 받기
+              매일 아침 추천 색 알림 받기
             </TextButton>
           </div>
         )}

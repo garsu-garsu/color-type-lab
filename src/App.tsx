@@ -164,6 +164,8 @@ function App() {
         onStart={() => {
           localStorage.setItem(ONBOARDED_KEY, "1");
           setOnboarded(true);
+          // 홈을 한 번 더 거치지 않고 바로 첫 질문으로 — 소개는 남기고 중간 단계만 없애요.
+          setView("quiz");
           trackScreen("onboarding_done");
         }}
       />
@@ -202,6 +204,7 @@ function App() {
   return (
     <HomeScreen
       state={state}
+      today={today}
       atRisk={streakAtRisk(today)}
       onStartQuiz={onStartQuiz}
       onGoToday={onGoToday}

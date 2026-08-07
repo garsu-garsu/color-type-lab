@@ -32,9 +32,9 @@
 
 ## 📸 스크린샷
 
-| 진단 시작 | 결과 + 베스트 컬러 | 상세 해금 | 오늘의 추천 |
+|  소개 화면 | 결과 + 베스트 컬러 | 상세 해금 | 오늘의 추천 |
 |:---:|:---:|:---:|:---:|
-| ![](screenshots/01-home-intro.png) | ![](screenshots/03-result.png) | ![](screenshots/04-result-unlocked.png) | ![](screenshots/05-today.png) |
+| ![](screenshots/01-onboarding.png) | ![](screenshots/03-result.png) | ![](screenshots/04-result-unlocked.png) | ![](screenshots/05-today.png) |
 
 ---
 
