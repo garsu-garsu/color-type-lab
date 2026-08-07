@@ -1,7 +1,7 @@
 import { Button, TextButton, Top } from "@toss/tds-mobile";
 
 import { BannerAd } from "../components/BannerAd";
-import { COLOR_TYPES, dailyPickFor } from "../data/color";
+import { COLOR_TYPES, dailyPickCount, dailyPickFor } from "../data/color";
 
 interface Props {
   typeId: number;
@@ -18,11 +18,15 @@ const SUB = "#7A6A72";
 export function TodayScreen({ typeId, today, extraCount, onExtra, onHome }: Props) {
   const type = COLOR_TYPES[typeId];
 
-  // 오늘 기본 추천 + 광고로 해금한 추가 추천들
+  // 오늘 기본 추천 + 광고로 해금한 추가 추천들.
+  // 풀 개수를 넘기면 첫 추천이 그대로 다시 나오니 거기서 멈춰요.
+  const total = dailyPickCount(type.key);
+  const shown = Math.min(extraCount, total - 1);
   const picks = [];
-  for (let i = 0; i <= extraCount; i++) {
+  for (let i = 0; i <= shown; i++) {
     picks.push(dailyPickFor(type.key, today, i));
   }
+  const exhausted = shown >= total - 1;
 
   return (
     <div style={{ paddingBottom: 32 }}>
@@ -78,11 +82,24 @@ export function TodayScreen({ typeId, today, extraCount, onExtra, onHome }: Prop
           ))}
         </div>
 
-        {/* 광고 보고 추천 하나 더 */}
+        {/* 광고 보고 추천 하나 더 — 오늘 볼 게 남았을 때만 */}
         <div style={{ marginTop: 16 }}>
-          <Button variant="weak" size="large" display="full" onClick={onExtra}>
-            📺 광고 보고 오늘 추천 하나 더
-          </Button>
+          {exhausted ? (
+            <div
+              style={{
+                textAlign: "center",
+                fontSize: 14,
+                color: SUB,
+                lineHeight: 1.6,
+              }}
+            >
+              오늘 추천 {total}개를 모두 봤어요. 내일 새로 바뀌어요.
+            </div>
+          ) : (
+            <Button variant="weak" size="large" display="full" onClick={onExtra}>
+              📺 광고 보고 오늘 추천 하나 더
+            </Button>
+          )}
         </div>
 
         <div style={{ textAlign: "center", marginTop: 14 }}>

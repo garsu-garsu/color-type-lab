@@ -251,6 +251,14 @@ export function dateHash(dateKey: string): number {
   return h;
 }
 
+/**
+ * 그 타입의 오늘 추천 개수. offset 이 이 수에 닿으면 첫 추천으로 되돌아가므로
+ * (offset % pool.length), 광고를 보고도 같은 추천을 다시 받게 돼요.
+ */
+export function dailyPickCount(typeKey: ColorType["key"]): number {
+  return DAILY_PICKS[typeKey].length;
+}
+
 /** 타입 + 오늘 날짜 + offset(추가로 본 개수) → 결정적 추천 1개 */
 export function dailyPickFor(
   typeKey: ColorType["key"],
