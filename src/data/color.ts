@@ -177,8 +177,6 @@ export const COLOR_TYPES: ColorType[] = [
   },
 ];
 
-export const TOTAL_TYPES = COLOR_TYPES.length;
-
 /**
  * 선택(각 옵션 index)을 받아 퍼스널컬러 타입 id 를 "결정적"으로 계산해요.
  * warm 합(Q1~4) ≥ 0 → 웜, deep 합(Q5~6) ≥ 0 → 딥.
