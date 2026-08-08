@@ -1,6 +1,5 @@
 import { Button, TextButton, Top } from "@toss/tds-mobile";
 
-import { BannerAd } from "../components/BannerAd";
 import { COLOR_TYPES, dailyPickCount, dailyPickFor } from "../data/color";
 
 interface Props {
@@ -121,9 +120,6 @@ export function TodayScreen({ typeId, today, extraCount, onExtra, onHome }: Prop
         </div>
       </div>
 
-      <div style={{ marginTop: 20 }}>
-        <BannerAd slot="today" />
-      </div>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import { Button, TextButton, Top, useToast } from "@toss/tds-mobile";
 
-import { BannerAd } from "../components/BannerAd";
 import { shareResult } from "../data/share";
 import { EVENT, track } from "../lib/analytics";
 import { COLOR_TYPES, type ColorChip } from "../data/color";
@@ -235,9 +234,6 @@ export function ResultScreen({
         </div>
       </div>
 
-      <div style={{ marginTop: 20 }}>
-        <BannerAd slot="result" />
-      </div>
     </div>
   );
 }
