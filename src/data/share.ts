@@ -5,7 +5,7 @@ import { isInTossApp } from "../lib/tossEnv";
 
 // getTossShareLink 는 "intoss://" 로 시작하는 딥링크만 받아요. "/" 를 넘기면 링크가
 // 만들어지지 않고, 아래 catch 가 그걸 삼켜서 텍스트만 공유돼요(= 받은 사람이 들어올 길이 없음).
-// granite.config.ts 의 appName 과 같아야 해요.
+// apps-in-toss.config.ts 의 appName 과 같아야 해요.
 const DEEP_LINK = "intoss://color-type-lab";
 const OG_IMAGE =
   "https://static.toss.im/appsintoss/13203/1f4dff41-83e1-455e-b601-7030846bfe7f.png";
