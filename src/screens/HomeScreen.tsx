@@ -1,10 +1,31 @@
 import { Button, TextButton, Top, useToast } from "@toss/tds-mobile";
+import { useEffect, useRef, useState } from "react";
 
+import { CoachMark } from "../components/CoachMark";
 import { canRequestNotifyConsent, requestNotifyConsent } from "../data/notify";
 import { shareResult } from "../data/share";
 import { EVENT, track } from "../lib/analytics";
 import { COLOR_TYPES, dailyPickFor, rankOf } from "../data/color";
 import type { ColorState } from "../hooks/useColorState";
+
+const ONBOARDED_KEY = "color:onboarded";
+
+/** 코치마크 투어를 봤는지. 저장이 막힌 환경(프라이빗 모드 등)에서는 매번 뜨는 걸
+ * 막기 위해 읽기 실패를 "이미 봤음"으로 처리해요. */
+function isOnboarded(): boolean {
+  try {
+    return localStorage.getItem(ONBOARDED_KEY) != null;
+  } catch {
+    return true;
+  }
+}
+function markOnboarded(): void {
+  try {
+    localStorage.setItem(ONBOARDED_KEY, "1");
+  } catch {
+    /* noop */
+  }
+}
 
 interface Props {
   state: ColorState;
@@ -41,6 +62,52 @@ export function HomeScreen({
   // 오늘의 추천 색 첫 장 — 오늘의 추천 화면과 같은 값이라 홈에서 미리 보여줘도 어긋나지 않아요.
   const todayPick = myType != null ? dailyPickFor(myType.key, today) : null;
 
+  // 진단 전 첫 화면에서만 도는 코치마크 투어 — 이미 진단했으면 짚어줄 요소가 없어요.
+  const introRef = useRef<HTMLDivElement>(null);
+  const startButtonRef = useRef<HTMLDivElement>(null);
+  const [step, setStep] = useState(() =>
+    myType == null && !isOnboarded() ? 0 : -1,
+  );
+  const tourSteps = [
+    { ref: introRef, message: "혈관 색·좋아하는 액세서리 같은 쉬운 질문 6개로 타입이 정해져요" },
+    {
+      ref: startButtonRef,
+      message:
+        "눌러서 시작해요. 봄웜톤·여름쿨톤처럼 내 타입과 베스트 컬러가 나오고, 저장하면 매일 추천 색도 받아요",
+    },
+  ];
+  const currentStep = step >= 0 ? tourSteps[step] : null;
+
+  const next = () => {
+    setStep((prev) => {
+      const n = prev + 1;
+      if (n >= tourSteps.length) {
+        markOnboarded();
+        return -1;
+      }
+      return n;
+    });
+  };
+  const skip = () => {
+    markOnboarded();
+    setStep(-1);
+  };
+
+  // 투어 중엔 화면 아무 데나 눌러도 다음 단계로 — "건너뛰기" 버튼만 예외예요.
+  useEffect(() => {
+    if (currentStep == null) return;
+    const onClick = (event: MouseEvent) => {
+      if ((event.target as HTMLElement | null)?.closest("[data-tour-skip]") != null)
+        return;
+      event.preventDefault();
+      event.stopPropagation();
+      next();
+    };
+    window.addEventListener("click", onClick, true);
+    return () => window.removeEventListener("click", onClick, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep]);
+
   const onShare = async () => {
     if (state.typeId == null) return;
     const ok = await shareResult(state.typeId);
@@ -76,6 +143,7 @@ export function HomeScreen({
           /* 아직 진단 전 — 진단 유도 */
           <>
             <div
+              ref={introRef}
               style={{
                 marginTop: 8,
                 background: "linear-gradient(160deg, #FFF1F5 0%, #FCE0E8 100%)",
@@ -103,7 +171,7 @@ export function HomeScreen({
                 질문 6개면 나와요.
               </div>
             </div>
-            <div style={{ marginTop: 20 }}>
+            <div ref={startButtonRef} style={{ marginTop: 20 }}>
               <Button size="large" display="full" onClick={onStartQuiz}>
                 내 퍼스널컬러 진단하기
               </Button>
@@ -246,6 +314,15 @@ export function HomeScreen({
         )}
       </div>
 
+      {currentStep != null && (
+        <CoachMark
+          targetRef={currentStep.ref}
+          message={currentStep.message}
+          index={step}
+          total={tourSteps.length}
+          onSkip={skip}
+        />
+      )}
     </div>
   );
 }

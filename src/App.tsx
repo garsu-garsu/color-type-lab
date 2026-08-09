@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { BannerAd, ImageBannerAd } from "./components/BannerAd";
 import { HomeScreen } from "./screens/HomeScreen";
-import { OnboardingScreen } from "./screens/OnboardingScreen";
 import { QuizScreen } from "./screens/QuizScreen";
 import { ResultScreen } from "./screens/ResultScreen";
 import { TodayScreen } from "./screens/TodayScreen";
@@ -18,8 +17,6 @@ import { EVENT, track, trackScreen } from "./lib/analytics";
 
 type View = "home" | "quiz" | "result" | "today";
 
-const ONBOARDED_KEY = "color:onboarded";
-
 function AppScreens() {
   const { state, diagnose, touchDaily, addExtra, streakAtRisk, keepStreak } =
     useColorState();
@@ -27,10 +24,6 @@ function AppScreens() {
   const { maybeShow } = useInterstitialAd(3);
 
   const [today, setToday] = useState<string>("");
-  // 첫 실행이면 소개 화면부터 — 한 번 보고 나면 다시 뜨지 않아요.
-  const [onboarded, setOnboarded] = useState(
-    () => localStorage.getItem(ONBOARDED_KEY) != null,
-  );
   const [view, setView] = useState<View>("home");
   const [resultTypeId, setResultTypeId] = useState<number | null>(null);
   const [resultStreak, setResultStreak] = useState(0);
@@ -156,20 +149,6 @@ function AppScreens() {
       >
         <Loader />
       </div>
-    );
-  }
-
-  if (!onboarded) {
-    return (
-      <OnboardingScreen
-        onStart={() => {
-          localStorage.setItem(ONBOARDED_KEY, "1");
-          setOnboarded(true);
-          // 홈을 한 번 더 거치지 않고 바로 첫 질문으로 — 소개는 남기고 중간 단계만 없애요.
-          setView("quiz");
-          trackScreen("onboarding_done");
-        }}
-      />
     );
   }
 
