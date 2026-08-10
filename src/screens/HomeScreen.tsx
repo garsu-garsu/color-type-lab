@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { CoachMark } from "../components/CoachMark";
 import { canRequestNotifyConsent, requestNotifyConsent } from "../data/notify";
 import { shareResult } from "../data/share";
-import { EVENT, track } from "../lib/analytics";
+import { EVENT, track, trackScreen } from "../lib/analytics";
 import { COLOR_TYPES, dailyPickFor, rankOf } from "../data/color";
 import type { ColorState } from "../hooks/useColorState";
 
@@ -25,6 +25,8 @@ function markOnboarded(): void {
   } catch {
     /* noop */
   }
+  // 코치마크 투어 종료(끝까지 보거나 건너뛰기) = 온보딩 완료
+  trackScreen("onboarding_done");
 }
 
 interface Props {
